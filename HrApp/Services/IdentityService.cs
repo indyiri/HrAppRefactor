@@ -22,17 +22,26 @@ namespace HrApp.Services
 
             try
             {
-                var searchUserByEmail = await _userManager.FindByEmailAsync(email);
+                IdentityUser user = null;
 
-                if (searchUserByEmail is not null)
+                if (!string.IsNullOrWhiteSpace(username))
                 {
-                    result.SignInResult = await _signInManager.PasswordSignInAsync(searchUserByEmail, password, false, false);
+                    user = await _userManager.FindByNameAsync(username);
                 }
-                else if (searchUserByEmail is null)
+                else if (!string.IsNullOrWhiteSpace(email))
                 {
-                    var searchUserByUserName = await _userManager.FindByNameAsync(username);
-                    result.SignInResult = await _signInManager.PasswordSignInAsync(searchUserByUserName, password, false, false);
+                    user = await _userManager.FindByEmailAsync(email);
                 }
+
+                if (user == null)
+                {
+                    result.Failed("User not found.");
+                    return result;
+                }
+
+                var signIn = await _signInManager.PasswordSignInAsync(user, password, isPersistent: false, lockoutOnFailure: false);
+
+                result.SignInResult = signIn;
             }
             catch (Exception ex)
             {

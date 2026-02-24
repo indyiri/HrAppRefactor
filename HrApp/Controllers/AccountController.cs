@@ -38,21 +38,14 @@ namespace HrApp.Controllers
             {
                 var result = await _service.LoginAsync(vm.UserName, null , vm.Password);
 
-                if (result is not null)
+                if (result.Succeeded)
                 {
-                    if (result.Succeeded)
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("", result.ErrorString);
-                    }
+                    return RedirectToAction("Index", "Home");
                 }
                 else
                 {
                     ModelState.AddModelError("", result.ErrorString);
-                }     
+                }
             }
             return View(vm);
         }
@@ -68,22 +61,15 @@ namespace HrApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> LoginEmailAsyc(LoginEmailViewModel vm)
+        public async Task<IActionResult> LoginEmail(LoginEmailViewModel vm)
         {
             if (ModelState.IsValid)
             {
                 var result = await _service.LoginAsync(null, vm.Email, vm.Password);
 
-                if (result is not null)
+                if (result.Succeeded)
                 {
-                    if (result.Succeeded)
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("", result.ErrorString);
-                    }
+                    return RedirectToAction("Index", "Home");
                 }
                 else
                 {
@@ -121,7 +107,7 @@ namespace HrApp.Controllers
                 }
 
             }
-            return View();
+            return View(vm);
         }
 
         #endregion

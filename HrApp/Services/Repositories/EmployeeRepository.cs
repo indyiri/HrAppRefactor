@@ -1,6 +1,7 @@
 ﻿using HrApp.Data;
 using HrApp.Models;
 using HrApp.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace HrApp.Services.Repositories
 {
@@ -13,29 +14,46 @@ namespace HrApp.Services.Repositories
             _context = context;
         }
 
-        public Task Add(Employee employee)
+        public async Task Add(Employee employee)
         {
-            throw new NotImplementedException();
+            _context.Employees.Add(employee);
+            await _context.SaveChangesAsync();
         }
 
-        public Task Delete(Employee employee)
+        public async Task Delete(Employee employee)
         {
-            throw new NotImplementedException();
+            if (!await EmployeeExists(employee.EmployeeId))
+                throw new InvalidOperationException($"Employee with id {employee.EmployeeId} does not exist.");
+
+            _context.Employees.Remove(employee);
+            await _context.SaveChangesAsync();
         }
 
-        public Task<IEnumerable<Employee>> GetAll()
+        public async Task<IEnumerable<Employee>> GetAll()
         {
-            throw new NotImplementedException();
+            return await _context.Employees.ToListAsync();
         }
 
-        public Task<Employee?> GetById(int? id)
+        public async Task<Employee?> GetById(int? id)
         {
-            throw new NotImplementedException();
+            if (id == null)
+                return null;
+
+            return await _context.Employees.FirstOrDefaultAsync(e => e.EmployeeId == id);
         }
 
-        public Task Update(Employee employee)
+        public async Task Update(Employee employee)
         {
-            throw new NotImplementedException();
+            if (!await EmployeeExists(employee.EmployeeId))
+                throw new InvalidOperationException($"Employee with id {employee.EmployeeId} does not exist.");
+
+            _context.Employees.Update(employee);
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task<bool> EmployeeExists(int id)
+        {
+            return await _context.Employees.AnyAsync(e => e.EmployeeId == id);
         }
     }
 }
