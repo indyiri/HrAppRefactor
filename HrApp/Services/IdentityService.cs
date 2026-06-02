@@ -16,7 +16,7 @@ namespace HrApp.Services
             _userManager = userManager;
         }
 
-        public async Task<IdentityServiceResult> LoginAsync(string username, string email, string password)
+        public async Task<IdentityServiceResult> LoginAsync(string? username, string? email, string password)
         {
             var result = new IdentityServiceResult();
 
